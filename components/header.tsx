@@ -23,7 +23,7 @@ export default function Header() {
           {!session && (
             <>
               <span className={styles.notSignedInText}>
-                You are not signed in
+                No estás conectado
               </span>
               <a
                 href={`/api/auth/signin`}
@@ -33,7 +33,7 @@ export default function Header() {
                   signIn()
                 }}
               >
-                Sign in
+                Iniciar sesión
               </a>
             </>
           )}
@@ -46,7 +46,7 @@ export default function Header() {
                 />
               )}
               <span className={styles.signedInText}>
-                <small>Signed in as</small>
+                <small>Conectado como</small>
                 <br />
                 <strong>{session.user.email ?? session.user.name}</strong>
               </span>
@@ -58,51 +58,13 @@ export default function Header() {
                   signOut()
                 }}
               >
-                Sign out
+                Cerrar sesión
               </a>
             </>
           )}
         </p>
       </div>
-      <nav>
-        <ul className={styles.navItems}>
-          <li className={styles.navItem}>
-            <Link href="/">
-              <a>Home</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href="/client">
-              <a>Client</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href="/server">
-              <a>Server</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href="/protected">
-              <a>Protected</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href="/api-example">
-              <a>API</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href="/admin">
-              <a>Admin</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link href="/me">
-              <a>Me</a>
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      
     </header>
   )
 }

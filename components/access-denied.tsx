@@ -3,7 +3,7 @@ import { signIn } from "next-auth/react"
 export default function AccessDenied() {
   return (
     <>
-      <h1>Access Denied</h1>
+      <h1>No estás autorizado</h1>
       <p>
         <a
           href="/api/auth/signin"
@@ -12,7 +12,7 @@ export default function AccessDenied() {
             signIn()
           }}
         >
-          You must be signed in to view this page
+          Debes iniciar sesión para ver esta página
         </a>
       </p>
     </>
