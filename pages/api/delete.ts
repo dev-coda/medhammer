@@ -1,6 +1,7 @@
 import connectMongo from "../../utils/connectMongo";
 import Booking, { bookingSchema } from "../../models/booking";
 import { Document } from "mongoose";
+import { AnalyticsTwoTone } from "@mui/icons-material";
 
 /**
  * @param {import('next').NextApiRequest} req
@@ -50,12 +51,12 @@ export default async function deleteBook (req: any, res: any) {
           const oID = `new ObjectId("${id}")`
           console.log(oID)
           
-     console.log(booking.reservations.findIndex(e => e._id.toString() == id))
-          if (user === booking.reservations[booking.reservations.findIndex(e => e._id.toString() === id)].owner) {
+     console.log(booking.reservations.findIndex((e: any) => e._id.toString() == id))
+          if (user === booking.reservations[booking.reservations.findIndex((e: any) => e._id.toString() === id)].owner) {
               
               
               //if there is a booking for the date, remove the reservation from the array
-      booking.reservations.splice(booking.reservations.findIndex(e => e._id.toString() ===id), 1);
+      booking.reservations.splice(booking.reservations.findIndex((e: any)=> e._id.toString() ===id), 1);
               
           } else { throw new Error("You are not the owner of this reservation")}
       

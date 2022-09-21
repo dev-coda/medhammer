@@ -118,7 +118,7 @@ export default function ProtectedPage({ bookings }: any) {
     owner: "",
     player1: String,
     player2: String,
-    date: Date,
+    date: new Date(),
     startTime: 600,
     endTime: 600,
     game: "Warhammer 40K",
@@ -139,7 +139,10 @@ export default function ProtectedPage({ bookings }: any) {
     });
     const data = await res.json();
     const setDate = new Date(formState.date);
-    setReservations(await fetchBookingNumber(new Date(setDate)));
+    if (setDate) {
+      setReservations(await fetchBookingNumber(new Date(setDate)));
+    }
+
     return data;
   };
 
@@ -164,7 +167,7 @@ export default function ProtectedPage({ bookings }: any) {
     console.log(data);
     const setDate = new Date(reservations.date);
     setReservations(await fetchBookingNumber(new Date(setDate)));
-    return data
+    return data;
   };
 
   const fetchBookingNumber = async (date: Date) => {
@@ -241,10 +244,12 @@ export default function ProtectedPage({ bookings }: any) {
           <DatePicker
             renderInput={(params) => <TextField {...params} />}
             onChange={(newValue) => {
-              setFormsState({
-                ...formState,
-                date: newValue,
-              });
+              if (newValue) {
+                setFormsState({
+                  ...formState,
+                  date: newValue,
+                });
+              }
             }}
             label="Fecha"
             value={formState.date}
@@ -257,10 +262,12 @@ export default function ProtectedPage({ bookings }: any) {
             value={formState.startTime}
             label="Hora de Inicio"
             onChange={(newValue) => {
-              setFormsState({
-                ...formState,
-                startTime: newValue.target.value,
-              });
+              if (typeof newValue.target.value === "number") {
+                setFormsState({
+                  ...formState,
+                  startTime: newValue.target.value,
+                });
+              }
             }}
           >
             <MenuItem value={600}>6:00 AM</MenuItem>
@@ -287,10 +294,12 @@ export default function ProtectedPage({ bookings }: any) {
             value={formState.endTime}
             label="Hora de Finalización"
             onChange={(newValue) => {
-              setFormsState({
-                ...formState,
-                endTime: newValue.target.value,
-              });
+              if (typeof newValue.target.value === "number") {
+                setFormsState({
+                  ...formState,
+                  endTime: newValue.target.value,
+                });
+              }
             }}
           >
             <MenuItem value={600}>6:00 AM</MenuItem>
@@ -385,9 +394,16 @@ export default function ProtectedPage({ bookings }: any) {
                                         }),
                                       });
                                       const data = await res.json();
-                                      console.log(data); const setDate = new Date(reservations.date);
+                                      console.log(data);
+                                      const setDate = new Date(
+                                        reservations.date
+                                      );
                                       setDate.setDate(setDate.getDate() + 1);
-                                      setReservations(await fetchBookingNumber(new Date(setDate)));
+                                      setReservations(
+                                        await fetchBookingNumber(
+                                          new Date(setDate)
+                                        )
+                                      );
                                     };
 
                                     deleteFunct(e);
