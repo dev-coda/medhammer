@@ -9,6 +9,9 @@ import "react-calendar/dist/Calendar.css";
 import { Button, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { Login } from "@mui/icons-material";
+import dayjs, { Dayjs } from "dayjs";
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
 
 export const getServerSideProps = async () => {
   try {
@@ -62,45 +65,6 @@ export default function ProtectedPage({ bookings }: any) {
   const [content, setContent] = useState();
   const [reservations, setReservations]: any = useState(undefined);
 
-  const createBook = async (e: any) => {
-    const res = await fetch("/api/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        owner: String,
-        player1: String,
-        player2: String,
-        date: Date,
-        startTime: String,
-        endTime: String,
-        game: String,
-      }),
-    });
-    const data = await res.json();
-    console.log(data);
-  };
-
-  const deleteBook = async (e: any) => {
-    const res = await fetch("/api/delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: String,
-        user: String,
-        date: Date,
-        startTime: String,
-        endTime: String,
-        game: String,
-      }),
-    });
-    const data = await res.json();
-    console.log(data);
-  };
-
   // Fetch content from protected route
   useEffect(() => {
     const fetchData = async () => {
@@ -118,7 +82,17 @@ export default function ProtectedPage({ bookings }: any) {
     owner: "",
     player1: String,
     player2: String,
-    date: new Date(),
+    date: new Date(
+      Date.UTC(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate(),
+        0,
+        0,
+        0,
+        0
+      )
+    ).toISOString(),
     startTime: 600,
     endTime: 600,
     game: "Warhammer 40K",
@@ -138,7 +112,7 @@ export default function ProtectedPage({ bookings }: any) {
       body: JSON.stringify(formState),
     });
     const data = await res.json();
-    const setDate = new Date(formState.date);
+    const setDate = new Date(formState.date).toUTCString();
     if (setDate) {
       setReservations(await fetchBookingNumber(new Date(setDate)));
     }
@@ -165,7 +139,7 @@ export default function ProtectedPage({ bookings }: any) {
     });
     const data = await res.json();
     console.log(data);
-    const setDate = new Date(reservations.date);
+    const setDate = new Date(reservations.date).toUTCString();
     setReservations(await fetchBookingNumber(new Date(setDate)));
     return data;
   };
@@ -242,17 +216,33 @@ export default function ProtectedPage({ bookings }: any) {
             variant="outlined"
           />
           <DatePicker
+            disablePast
             renderInput={(params) => <TextField {...params} />}
-            onChange={(newValue) => {
+            onChange={(newValue: any) => {
               if (newValue) {
+                const newDate = newValue.set("hour", 0).utc().toDate();
+                newDate.setHours(0);
+                const utcDate = new Date(
+                  Date.UTC(
+                    newDate.getFullYear(),
+                    newDate.getMonth(),
+                    newDate.getDate(),
+                    0,
+                    0,
+                    0,
+                    0
+                  )
+                ).toISOString();
+                new Date();
                 setFormsState({
                   ...formState,
-                  date: newValue,
+                  date: utcDate,
                 });
               }
             }}
             label="Fecha"
-            value={formState.date}
+            /* For some ungodly reason this component renders always in local. So this spaghetti is to make it appear as UTC even if it's local.*/ 
+            value={function () { return new Date(new Date(formState.date).getTime() + new Date(formState.date).getTimezoneOffset() * 60000) }()}
           />
 
           <InputLabel id="startTime">Hora de Inicio</InputLabel>
@@ -387,7 +377,7 @@ export default function ProtectedPage({ bookings }: any) {
                                         body: JSON.stringify({
                                           id: booking._id,
                                           user: session?.user?.name || "",
-                                          date: new Date(reservations.date),
+                                          date: reservations.date,
                                           startTime: booking.startTime,
                                           endTime: booking.endTime,
                                           game: booking.game,
