@@ -186,7 +186,7 @@ export default function ProtectedPage({ bookings }: any) {
               : new Date()
           }
           onClickDay={async (value, event) => {
-            setReservations(await fetchBookingNumber(value));
+            setReservations(await fetchBookingNumber(new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0)));
           }}
           calendarType="ISO 8601"
         />
