@@ -8,10 +8,12 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { Button, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
-import { Login } from "@mui/icons-material";
+import { DataObjectSharp, Login } from "@mui/icons-material";
 import dayjs, { Dayjs } from "dayjs";
-const utc = require("dayjs/plugin/utc");
+import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+var customParseFormat = require("dayjs/plugin/customParseFormat");
+dayjs.extend(customParseFormat);
 
 export const getServerSideProps = async () => {
   try {
@@ -112,10 +114,7 @@ export default function ProtectedPage({ bookings }: any) {
       body: JSON.stringify(formState),
     });
     const data = await res.json();
-    const setDate = new Date(formState.date).toUTCString();
-    if (setDate) {
-      setReservations(await fetchBookingNumber(new Date(setDate)));
-    }
+    setReservations(await fetchBookingNumber(dayjs.utc().format()));
 
     return data;
   };
@@ -140,11 +139,13 @@ export default function ProtectedPage({ bookings }: any) {
     const data = await res.json();
     console.log(data);
     const setDate = new Date(reservations.date).toUTCString();
-    setReservations(await fetchBookingNumber(new Date(setDate)));
+    setReservations(
+      await fetchBookingNumber(dayjs().utc().set("hour", 0).format())
+    );
     return data;
   };
 
-  const fetchBookingNumber = async (date: Date) => {
+  const fetchBookingNumber = async (date: string) => {
     const res = await fetch("/api/bookingNumber", {
       method: "POST",
       headers: {
@@ -153,6 +154,7 @@ export default function ProtectedPage({ bookings }: any) {
       body: JSON.stringify({ date }),
     });
     const data = await res.json();
+    
     return data;
   };
 
@@ -173,20 +175,18 @@ export default function ProtectedPage({ bookings }: any) {
         <h1>Reservas Medhammer</h1>
         <Calendar
           value={
-            reservations
-              ? new Date(
-                  new Date(reservations?.date).getUTCFullYear(),
-                  new Date(reservations?.date).getUTCMonth(),
-                  new Date(reservations?.date).getUTCDate(),
-                  0,
-                  0,
-                  0,
-                  0
-                )
-              : new Date()
+            reservations?.date ? dayjs(reservations?.date, "YYYY-MM-DD")
+                  .utcOffset(0)
+                  .utc(true)
+                  .toDate()
+              : dayjs.utc().toDate()
           }
           onClickDay={async (value, event) => {
-            setReservations(await fetchBookingNumber(new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0)));
+            setReservations(
+              await fetchBookingNumber(
+                dayjs(value).utc().set("hour", 0).format()
+              )
+            );
           }}
           calendarType="ISO 8601"
         />
@@ -241,8 +241,13 @@ export default function ProtectedPage({ bookings }: any) {
               }
             }}
             label="Fecha"
-            /* For some ungodly reason this component renders always in local. So this spaghetti is to make it appear as UTC even if it's local.*/ 
-            value={function () { return new Date(new Date(formState.date).getTime() + new Date(formState.date).getTimezoneOffset() * 60000) }()}
+            /* For some ungodly reason this component renders always in local. So this spaghetti is to make it appear as UTC even if it's local.*/
+            value={(function () {
+              return new Date(
+                new Date(formState.date).getTime() +
+                  new Date(formState.date).getTimezoneOffset() * 60000
+              );
+            })()}
           />
 
           <InputLabel id="startTime">Hora de Inicio</InputLabel>

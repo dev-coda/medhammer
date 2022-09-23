@@ -6,7 +6,6 @@ export default async function dateBookings(req: any, res: any) {
     try {
         await connectMongo();
         let newDate = new Date(req.body.date)
-        newDate.setHours(-5, 0, 0)
         const booking: any = await Booking.findOne({
             date: newDate 
         });
