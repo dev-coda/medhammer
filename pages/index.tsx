@@ -114,36 +114,12 @@ export default function ProtectedPage({ bookings }: any) {
       body: JSON.stringify(formState),
     });
     const data = await res.json();
-    setReservations(await fetchBookingNumber(dayjs.utc().format()));
+    setReservations(await fetchBookingNumber(dayjs(reservations?.date, "YYYY-MM-DD").utcOffset(0).utc(true).format()));
 
+                                          
     return data;
   };
 
-  const handleDelete = async (e: any) => {
-    e.preventDefault();
-    console.log(e);
-    const res = await fetch("/api/delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: e.target.id,
-        user: session?.user?.name || "",
-        date: e.target.date,
-        startTime: e.target.startTime,
-        endTime: e.target.endTime,
-        game: e.target.game,
-      }),
-    });
-    const data = await res.json();
-    console.log(data);
-    const setDate = new Date(reservations.date).toUTCString();
-    setReservations(
-      await fetchBookingNumber(dayjs().utc().set("hour", 0).format())
-    );
-    return data;
-  };
 
   const fetchBookingNumber = async (date: string) => {
     const res = await fetch("/api/bookingNumber", {
@@ -396,7 +372,7 @@ export default function ProtectedPage({ bookings }: any) {
                                       setDate.setDate(setDate.getDate() + 1);
                                       setReservations(
                                         await fetchBookingNumber(
-                                          new Date(setDate).toISOString()
+                                          dayjs(reservations?.date, "YYYY-MM-DD").utcOffset(0).utc(true).format()
                                         )
                                       );
                                     };

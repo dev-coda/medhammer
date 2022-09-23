@@ -38,7 +38,6 @@ export default async function addTest(req: any, res: any) {
     console.log("CONNECTED TO MONGO");
     //find if there is a booking for the date
     const newDate = new Date(req.body.date);
-    newDate.setHours(-5, 0, 0);
     const booking: any = await Booking.findOne({
       date: newDate,
     });
