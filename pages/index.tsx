@@ -396,7 +396,7 @@ export default function ProtectedPage({ bookings }: any) {
                                       setDate.setDate(setDate.getDate() + 1);
                                       setReservations(
                                         await fetchBookingNumber(
-                                          new Date(setDate)
+                                          new Date(setDate).toISOString()
                                         )
                                       );
                                     };
